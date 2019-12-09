@@ -7,8 +7,8 @@
     "dev": "parcel index.html",
     "build": "parcel build index.html",
     "test": "jest",
-    "lint": "eslint js/",
-    "lint:fix": "eslint js/ --fix"
+    "lint": "tslint -p .",
+    "lint:fix": "tslint -p . --fix"
   },
   "author": "",
   "license": "MIT",
