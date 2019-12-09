@@ -1,3 +1,4 @@
+import { sendToSimilarMovies } from "./index";
 import { IMovie, IState } from "./interfaces";
 
 const printPosterUrl = (movie: IMovie): string =>
@@ -38,7 +39,7 @@ function renderError(state: IState, node: HTMLElement) {
   node.innerHTML = state.error;
 }
 
-function renderGrid(state: IState, node: HTMLElement, func: EventListenerObject) {
+function renderGrid(state: IState, node: HTMLElement, func: any) {
   if (!state.similar) {
     node.style.display = "none";
     return undefined;
@@ -47,7 +48,7 @@ function renderGrid(state: IState, node: HTMLElement, func: EventListenerObject)
   node.style.display = "grid";
   node.innerHTML = moviesCards(state.similar);
 
-  const cards = [ ...document.getElementsByClassName("movie-card") ];
+  const cards = Array.from(document.getElementsByClassName("movie-card")) as HTMLElement[];
 
   cards.forEach((card) => card.addEventListener("click", func));
 }
@@ -70,6 +71,6 @@ export default function(
   return () => {
     renderDetail(state, detailNode);
     renderError(state, errorNode);
-    renderGrid(state, similarNode);
+    renderGrid(state, similarNode, sendToSimilarMovies);
   };
 }

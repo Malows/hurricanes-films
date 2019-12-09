@@ -6,14 +6,20 @@ import { getMovieByTitle, getSimilarMovieById } from "./services";
 import { sortByVote } from "./sort";
 
 /**
- * Inicializo los nodos
- * Debería crearlos si no los encuenctro
- * para evitar el error de ser HTMLElement | null
+ * Referencia fuerte a los nodos necesarios
  */
-const title = document.getElementById("title");
-const errorMessage = document.getElementById("errorMessage");
-const similar = document.getElementById("films");
-const detail = document.getElementById("detail");
+const title = document.getElementById("title") as HTMLInputElement;
+const errorMessage = document.getElementById("errorMessage") as HTMLElement;
+const similar = document.getElementById("films") as HTMLElement;
+const detail = document.getElementById("detail") as HTMLElement;
+
+/**
+ * Si no existen los nodos necesarios detengo la app
+ * Siempre existen porque son parte del html inicial
+ */
+// if (!errorMessage || !title || !similar || !detail) {
+//   throw Error('Undefined HTML nodes');
+// }
 
 /**
  * El estado de la app
@@ -35,9 +41,9 @@ const render = Renderer(state, errorMessage, similar, detail);
  * y es `sendToSimilarMovies`
  */
 title.addEventListener("keyup", debounce(() => {
-  const titleContent = title.getAttribute("value").trim();
+  const titleContent = title.value.trim();
 
-  if (!titleContent) {
+  if (titleContent.length === 0) {
     state.similar = null;
     state.error = "¿Estas seguro que esa es tu peli favorita? No me suena.";
     state.detail = null;
@@ -45,30 +51,35 @@ title.addEventListener("keyup", debounce(() => {
   }
 
   getMovieByTitle(titleContent)
-  .then(({ results }) => {
-      state.detail = null;
+    .then(({ results }) => {
+        state.detail = null;
 
-      if (!results || results.length === 0) {
-        state.error = "¿Estas seguro que esa es tu peli favorita? No me suena.";
-        state.similar = null;
-      } else {
-        state.similar = results.sort(sortByVote).slice(0, 12);
-        state.error = null;
-      }
+        if (!results || results.length === 0) {
+          state.error = "¿Estas seguro que esa es tu peli favorita? No me suena.";
+          state.similar = null;
+        } else {
+          state.similar = results.sort(sortByVote).slice(0, 12);
+          state.error = null;
+        }
 
-      render();
-    });
+        render();
+      });
 }, 500));
 
 /**
  * Esta función tiene que llegar a render -> refactorización
  */
-function sendToSimilarMovies({ target }) {
-  const elem = target.nodeName === "IMG"
-    ? target.parentNode
-    : target;
+export function sendToSimilarMovies(elem: HTMLElement) {
 
-  getSimilarMovieById(elem.dataset.id)
+  // const elem: HTMLElement = <HTMLElement>this;
+  // const target = event
+  // const elem = target !== null && target.nodeName === "IMG"
+  //   ? target.parentNode
+  //   : target;
+
+  const movieId = parseInt(elem.dataset.id || "", 10);
+
+  getSimilarMovieById(movieId)
     .then(({ results }) => {
       state.similar = null;
 

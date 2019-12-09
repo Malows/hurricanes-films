@@ -1,6 +1,6 @@
 export const apiRequest = (KEY: string) =>
   (URI: string) =>
-    (params) => {
+    (params: object) => {
       const url = new URL(`https://api.themoviedb.org/3/${URI}`);
 
       url.searchParams.append("language", "es-ES");
